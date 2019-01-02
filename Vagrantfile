@@ -71,19 +71,22 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
   #  apt-get update
     # install docker + docker compose
-    sudo apt install -y docker docker-compose
+    sudo apt-get install -y docker docker-compose
     sudo usermod -a -G docker vagrant
-    mkdir ~vagrant/docker_work
-    sudo apt install -y git emacs-nox
+    mkdir -p ~vagrant/docker_work
+    sudo apt-get install -y git emacs-nox
     git config --global --unset core.autocrlf
-    sudo apt install -y openjdk-11-jdk-headless
-    sudo apt install -y python-pip
+    sudo apt-get install -y openjdk-11-jdk-headless
+    sudo apt-get install -y python-pip
     python -m pip install --upgrade --user awscli
     # Setup aws credentials?
+    
+
+    cd /opt/mc_docker_bakery_work
 
     # Run checkout for all containers.
     sudo chmod +x install-build-scripts.sh
-    $HOME/docker_work/install-build-scripts.sh
+    ./install-build-scripts.sh
 
   SHELL
 end
