@@ -73,15 +73,18 @@ Vagrant.configure("2") do |config|
     # install docker + docker compose
     sudo apt-get install -y docker docker-compose
     sudo usermod -a -G docker vagrant
-    mkdir -p ~vagrant/docker_work
+
     sudo apt-get install -y git emacs-nox
     git config --global --unset core.autocrlf
+
     sudo apt-get install -y openjdk-11-jdk-headless
     sudo apt-get install -y python-pip
+
     python -m pip install --upgrade --user awscli
     # Setup aws credentials?
     
-
+    # Create working directory, if not exists.
+    mkdir -p /opt/mc_docker_bakery_work
     cd /opt/mc_docker_bakery_work
 
     # Run checkout for all containers.
