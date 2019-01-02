@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
   # information on available options.
 
   # Install checkout script.
-  config.vm.provision "file", source: "install-build-scripts.sh", destination: "$HOME/docker_work/install-build-scripts.sh"
+  config.vm.provision "file", source: "install-build-scripts.sh", destination: "/opt/mc_docker_bakery_work/install-build-scripts.sh"
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
@@ -89,7 +89,7 @@ Vagrant.configure("2") do |config|
 
     # Run checkout for all containers.
     sudo chmod +x install-build-scripts.sh
-    ./install-build-scripts.sh
+    ./install-build-scripts.sh "/opt/mc_docker_bakery_work"
 
   SHELL
 end
