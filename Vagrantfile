@@ -71,33 +71,35 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
   #  apt-get update
     # install docker (Not docker compose because of X11 bug in credentials helper)
-    sudo apt-get install -y docker
+    sudo apt-get install -y docker.io
     sudo usermod -a -G docker vagrant
-
+	sudo systemctl start docker
+    sudo systemctl enable docker
+ 
     sudo apt-get install -y git emacs-nox
     git config --global --unset core.autocrlf
 
-    sudo apt-get install -y openjdk-11-jdk-headless
+    sudo apt-get install -y openjdk-8-jdk
     sudo apt-get install -y python-pip
 
-  #  python -m pip install --upgrade --user awscli
+    #  python -m pip install --upgrade --user awscli
     sudo pip install --upgrade awscli
 
-    # Setup aws credentials?
-    
     # Create working directory, if not exists.
     mkdir -p /opt/mc_docker_bakery_work
     cd /opt/mc_docker_bakery_work
 
-    # Run checkout for all containers.
+    # Prepare installation of docker image build scripts.
 	echo '******************************************************'
     sudo chmod +x install-build-scripts.sh
+	echo ' run <git config --global user.email YOUR-EMAILADDRESS> to configure git' 
     echo ' Run </opt/mc_docker_bakery_work/install-build-scripts.sh "/opt/mc_docker_bakery_work"> '
 	echo ' to install docker build scripts to /opt/mc_docker_bakery_work '
 	echo ' This path is mapped to the synced folder "mc_docker_bakery_work" '
 	echo ' on your host for easy file editing. '
 	echo ' Before running individual docker image build scripts configure the '
 	echo ' build environmennt, i.e. copy environment setup script to /opt/mc_docker_bakery_work. '
+	echo '******************************************************'
 
   SHELL
 end
