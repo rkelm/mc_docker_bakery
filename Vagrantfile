@@ -80,7 +80,9 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y openjdk-11-jdk-headless
     sudo apt-get install -y python-pip
 
-    python -m pip install --upgrade --user awscli
+  #  python -m pip install --upgrade --user awscli
+    sudo pip install --upgrade awscli
+
     # Setup aws credentials?
     
     # Create working directory, if not exists.
