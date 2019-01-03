@@ -70,7 +70,7 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
   #  apt-get update
-    # install docker + docker compose
+    # install docker (Not docker compose because of X11 bug in credentials helper)
     sudo apt-get install -y docker
     sudo usermod -a -G docker vagrant
 
