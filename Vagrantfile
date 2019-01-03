@@ -90,8 +90,14 @@ Vagrant.configure("2") do |config|
     cd /opt/mc_docker_bakery_work
 
     # Run checkout for all containers.
+	echo '******************************************************'
     sudo chmod +x install-build-scripts.sh
-    ./install-build-scripts.sh "/opt/mc_docker_bakery_work"
+    echo ' Run </opt/mc_docker_bakery_work/install-build-scripts.sh "/opt/mc_docker_bakery_work"> '
+	echo ' to install docker build scripts to /opt/mc_docker_bakery_work '
+	echo ' This path is mapped to the synced folder "mc_docker_bakery_work" '
+	echo ' on your host for easy file editing. '
+	echo ' Before running individual docker image build scripts configure the '
+	echo ' build environmennt, i.e. copy environment setup script to /opt/mc_docker_bakery_work. '
 
   SHELL
 end
