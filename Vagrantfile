@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
   #  apt-get update
     # install docker + docker compose
-    sudo apt-get install -y docker docker-compose
+    sudo apt-get install -y docker
     sudo usermod -a -G docker vagrant
 
     sudo apt-get install -y git emacs-nox
