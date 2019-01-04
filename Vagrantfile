@@ -45,7 +45,11 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder "../mc_docker_bakery_work", "/opt/mc_docker_bakery_work", create: true
+  
+  # Commented out because of issues with building the spigot jar. 
+  # Building the spigot jar does not work on y synced folder. The build.sh script
+  # should be changed to build the spigot jar in a different folder (tmp?).
+  # config.vm.synced_folder "../mc_docker_bakery_work", "/opt/mc_docker_bakery_work", create: true
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -63,7 +67,7 @@ Vagrant.configure("2") do |config|
   # information on available options.
 
   # Install checkout script.
-  config.vm.provision "file", source: "install-build-scripts.sh", destination: "/opt/mc_docker_bakery_work/install-build-scripts.sh"
+#  config.vm.provision "file", source: "install-build-scripts.sh", destination: "/opt/mc_docker_bakery_work/install-build-scripts.sh"
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
@@ -71,32 +75,43 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
   #  apt-get update
     # install docker (Not docker compose because of X11 bug in credentials helper)
-    sudo apt-get install -y docker.io
+    sudo apt-get -qy install docker.io
     sudo usermod -a -G docker vagrant
 	sudo systemctl start docker
     sudo systemctl enable docker
  
-    sudo apt-get install -y git emacs-nox
+    sudo apt-get -qy install git 
+	sudo apt-get -qy install emacs-nox
     git config --global --unset core.autocrlf
 
-    sudo apt-get install -y openjdk-8-jdk
-    sudo apt-get install -y python-pip
+    sudo apt-get -qy install openjdk-8-jdk
+    sudo apt-get -qy install python-pip
 
     #  python -m pip install --upgrade --user awscli
-    sudo pip install --upgrade awscli
+    sudo pip -q install --upgrade awscli
 
     # Create working directory, if not exists.
-    mkdir -p /opt/mc_docker_bakery_work
+    sudo mkdir -p /opt/mc_docker_bakery_work
+	sudo chown vagrant /opt/mc_docker_bakery_work
+	sudo chgrp vagrant /opt/mc_docker_bakery_work
     cd /opt/mc_docker_bakery_work
+	
+	cp /vagrant/install-build-scripts.sh /opt/mc_docker_bakery_work
+	chmod +x /opt/mc_docker_bakery_work/install-build-scripts.sh
+	chown vagrant /opt/mc_docker_bakery_work
+	chgrp vagrant /opt/mc_docker_bakery_work
+	
+	ln -s /opt/mc_docker_bakery_work ~vagrant/
 
     # Prepare installation of docker image build scripts.
 	echo '******************************************************'
-    sudo chmod +x install-build-scripts.sh
-	echo ' run <git config --global user.email YOUR-EMAILADDRESS> to configure git' 
+    echo ' run <git config --global user.email YOUR-EMAILADDRESS> to configure git' 
+	echo '  ***'
     echo ' Run </opt/mc_docker_bakery_work/install-build-scripts.sh "/opt/mc_docker_bakery_work"> '
 	echo ' to install docker build scripts to /opt/mc_docker_bakery_work '
 	echo ' This path is mapped to the synced folder "mc_docker_bakery_work" '
 	echo ' on your host for easy file editing. '
+	echo '  ***'
 	echo ' Before running individual docker image build scripts configure the '
 	echo ' build environmennt, i.e. copy environment setup script to /opt/mc_docker_bakery_work. '
 	echo '******************************************************'

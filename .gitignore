@@ -1,2 +1,4 @@
 /.vagrant/
 /docker_work/
+/set_docker_build_env_vars.sh
+*.jar
