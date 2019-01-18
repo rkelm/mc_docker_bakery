@@ -1,4 +1,5 @@
 # mc_docker_bakery
+State: RELEASED
 Vagrant setup files for a virtual ubuntu virtualbox machine to build Minecraft docker images.
 
 Requirements: 
