@@ -57,7 +57,7 @@ Vagrant.configure("2") do |config|
   #
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
-    vb.gui = true
+    vb.gui = false
   
     # Customize the amount of memory on the VM:
     vb.memory = "4096"
@@ -86,9 +86,10 @@ Vagrant.configure("2") do |config|
 
     sudo apt-get -qy install openjdk-8-jdk
     sudo apt-get -qy install python-pip
-
     #  python -m pip install --upgrade --user awscli
     sudo pip -q install --upgrade awscli
+
+    sudo apt-get -qy install python3-pip
 
     # Create working directory, if not exists.
     sudo mkdir -p /opt/mc_docker_bakery_work
