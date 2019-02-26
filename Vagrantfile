@@ -14,11 +14,12 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "bento/ubuntu-18.04"
   # config.vm.box = "ubuntu/ubuntu-18.04"
+  config.vm.box_version = "201812.27.0"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+  config.vm.box_check_update = false
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -73,38 +74,83 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-  #  apt-get update
+    function errchk {
+        local exitcode=$?
+        local msg=$1
+        if test "$exitcode" -ne "0" ; then
+            echo "(Exit code: $exitcode) ${msg:-error}"
+            exit $exitcode
+        fi
+    }
+
+
+    echo '+++++ Disable debconf for interactive preconfiguring packages +++++'
+    sudo ex +"%s@DPkg@//DPkg" -cwq /etc/apt/apt.conf.d/70debconf
+    sudo dpkg-reconfigure debconf -f noninteractive -p critical
+    # Alternate method if debconf is needed.
+    # export DEBIAN_FRONTEND=noninteractive
+
+    echo '+++++ Updating package index +++++'
+    sudo apt-get -qy update  > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+
     # install docker (Not docker compose because of X11 bug in credentials helper)
-    sudo apt-get -qy install docker.io
-    sudo usermod -a -G docker vagrant
-	sudo systemctl start docker
-    sudo systemctl enable docker
+    echo '+++++ Installing docker +++++'
+    sudo apt-get -qy install docker.io > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    sudo usermod -a -G docker vagrant 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	sudo systemctl start docker 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    sudo systemctl enable docker 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
  
-    sudo apt-get -qy install git 
-	sudo apt-get -qy install emacs-nox
-    git config --global --unset core.autocrlf
+    echo '+++++ Installing git +++++'
+    sudo apt-get -qy install git > /dev/null
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    sudo git config --global --unset core.autocrlf 
 
-    sudo apt-get -qy install openjdk-8-jdk
-    sudo apt-get -qy install python-pip
+    echo '+++++ Installing emacs editor +++++'
+	sudo apt-get -qy install emacs-nox > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+
+    echo '+++++ Installing JDK +++++'
+    sudo apt-get -qy install openjdk-8-jdk > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+
+    echo '+++++ Installing python2 pip & awscli +++++'
+    sudo apt-get -qy install python-pip > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
     #  python -m pip install --upgrade --user awscli
-    sudo pip -q install --upgrade awscli
+    sudo pip -q install --upgrade awscli > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
-    sudo apt-get -qy install python3-pip
+    echo '+++++ Installing python3 pip +++++'
+    sudo apt-get -qy install python3-pip > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
-    # Create working directory, if not exists.
-    sudo mkdir -p /opt/mc_docker_bakery_work
-	sudo chown vagrant /opt/mc_docker_bakery_work
-	sudo chgrp vagrant /opt/mc_docker_bakery_work
-    cd /opt/mc_docker_bakery_work
+    echo '+++++ Setting up working directory +++++'
+    sudo mkdir -p /opt/mc_docker_bakery_work 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	sudo chown vagrant /opt/mc_docker_bakery_work 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	sudo chgrp vagrant /opt/mc_docker_bakery_work 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    cd /opt/mc_docker_bakery_work 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 	
-	cp /vagrant/install-build-scripts.sh /opt/mc_docker_bakery_work
-	chmod +x /opt/mc_docker_bakery_work/install-build-scripts.sh
-	chown vagrant /opt/mc_docker_bakery_work
-	chgrp vagrant /opt/mc_docker_bakery_work
+	cp /vagrant/install-build-scripts.sh /opt/mc_docker_bakery_work 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	chmod +x /opt/mc_docker_bakery_work/install-build-scripts.sh 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	chown vagrant /opt/mc_docker_bakery_work 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	chgrp vagrant /opt/mc_docker_bakery_work 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 	
-	ln -s /opt/mc_docker_bakery_work ~vagrant/
+	ln -s /opt/mc_docker_bakery_work ~vagrant/ 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
-    # Prepare installation of docker image build scripts.
 	echo '******************************************************'
     echo ' run <git config --global user.email YOUR-EMAILADDRESS> to configure git' 
 	echo '  ***'
@@ -114,7 +160,7 @@ Vagrant.configure("2") do |config|
 	echo ' on your host for easy file editing. '
 	echo '  ***'
 	echo ' Before running individual docker image build scripts configure the '
-	echo ' build environmennt, i.e. copy environment setup script to /opt/mc_docker_bakery_work. '
+	echo ' build environment, i.e. copy environment setup script to /opt/mc_docker_bakery_work. '
 	echo '******************************************************'
 
   SHELL
