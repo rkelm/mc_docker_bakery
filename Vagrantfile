@@ -82,12 +82,13 @@ Vagrant.configure("2") do |config|
         fi
     }
 
-
     echo '+++++ Disable debconf for interactive preconfiguring packages +++++'
     sudo ex +"%s@DPkg@//DPkg" -cwq /etc/apt/apt.conf.d/70debconf
     sudo dpkg-reconfigure debconf -f noninteractive -p critical
+    # Tell dpkg to restart services without asking.
+    echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
     # Alternate method if debconf is needed.
-    # export DEBIAN_FRONTEND=noninteractive
+    export DEBIAN_FRONTEND=noninteractive
 
     echo '+++++ Updating package index +++++'
     sudo apt-get -qy update  > /dev/null 
@@ -128,38 +129,41 @@ Vagrant.configure("2") do |config|
     sudo apt-get -qy install python3-pip > /dev/null 
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
-    echo '+++++ Setting up working directory +++++'
-    sudo mkdir -p /opt/mc_docker_bakery_work 
+    export work_dir='/opt/mc_docker_bakery_work'
+    echo "+++++ Setting up working directory ${work_dir} +++++"
+    sudo mkdir -p  ${work_dir}
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
-	sudo chown vagrant /opt/mc_docker_bakery_work 
+	sudo chown vagrant ${work_dir}
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
-	sudo chgrp vagrant /opt/mc_docker_bakery_work 
+	sudo chgrp vagrant ${work_dir}
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
-    cd /opt/mc_docker_bakery_work 
-    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
-	
-	cp /vagrant/install-build-scripts.sh /opt/mc_docker_bakery_work 
-    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
-	chmod +x /opt/mc_docker_bakery_work/install-build-scripts.sh 
-    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
-	chown vagrant /opt/mc_docker_bakery_work 
-    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
-	chgrp vagrant /opt/mc_docker_bakery_work 
+    cd ${work_dir}
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 	
-	ln -s /opt/mc_docker_bakery_work ~vagrant/ 
+	cp /vagrant/install-build-scripts.sh ${work_dir} 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	chmod +x ${work_dir}/install-build-scripts.sh 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	chown vagrant ${work_dir}
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	chgrp vagrant ${work_dir}
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+	
+	ln -s ${work_dir} ~vagrant/ 
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
 	echo '******************************************************'
+    echo ' After logging in to vagrant box: '
+    echo ''
     echo ' run <git config --global user.email YOUR-EMAILADDRESS> to configure git' 
-	echo '  ***'
-    echo ' Run </opt/mc_docker_bakery_work/install-build-scripts.sh "/opt/mc_docker_bakery_work"> '
-	echo ' to install docker build scripts to /opt/mc_docker_bakery_work '
-	echo ' This path is mapped to the synced folder "mc_docker_bakery_work" '
-	echo ' on your host for easy file editing. '
-	echo '  ***'
+    echo ''
+    echo " run </vagrant/install-build-scripts.sh ${work_dir}> "
+	echo " to install docker build scripts to ${work_dir} "
+#	echo ' This path is mapped to the synced folder "mc_docker_bakery_work" '
+#	echo ' on your host for easy file editing. '
+    echo ''
 	echo ' Before running individual docker image build scripts configure the '
-	echo ' build environment, i.e. copy environment setup script to /opt/mc_docker_bakery_work. '
+	echo " build environment, i.e. create environment setup script in ${work_dir}. "
 	echo '******************************************************'
 
   SHELL
