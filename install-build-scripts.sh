@@ -6,16 +6,14 @@ echo "Running $0"
 
 target_dir=$1
 
-if [ -z "$target_dir"] ; then
+#if [ -z "$target_dir" ] ; then
 	# The project directory is the folder containing this script.
-	project_dir=$( dirname "$0" )
-	project_dir=$( ( cd "$project_dir" && pwd ) )
-fi
+#	_dir=$( dirname "$0" )
+#	project_dir=$( ( cd "$_dir" && pwd ) )
+#fi
 
-echo "Target directory is ${target_dir}."
-
-if [ -n "$target_dir" ] ; then
-	echo "Error: Target directory does not exist."	
+if [ ! -d "$target_dir" ] ; then
+	echo "Error: Target directory not specified or directory '$target_dir' does not exist."	
 	exit 1
 fi
 	
