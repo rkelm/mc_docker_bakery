@@ -12,9 +12,9 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "bento/ubuntu-18.04"
+  config.vm.box = "bento/ubuntu-21.04"
   # config.vm.box = "ubuntu/ubuntu-18.04"
-  config.vm.box_version = "201812.27.0"
+  config.vm.box_version = "202107.28.0"
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
@@ -110,19 +110,24 @@ Vagrant.configure("2") do |config|
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
     sudo git config --global --unset core.autocrlf 
 
+    echo '+++++ Installing jq +++++'
+    sudo apt-get -qy install jq > /dev/null
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+
     echo '+++++ Installing emacs editor +++++'
 	sudo apt-get -qy install emacs-nox > /dev/null 
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
     echo '+++++ Installing JDK +++++'
-    sudo apt-get -qy install openjdk-8-jdk > /dev/null 
+    sudo apt-get -qy install openjdk-16-jdk > /dev/null 
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
-    echo '+++++ Installing python2 pip & awscli +++++'
-    sudo apt-get -qy install python-pip > /dev/null 
-    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    echo '+++++ Installing awscli +++++'
+    #sudo apt-get -qy install python-pip > /dev/null 
+    #errchk "{$LINENO}: Error provisioning box. Exiting provision script."
     #  python -m pip install --upgrade --user awscli
-    sudo pip -q install --upgrade awscli > /dev/null 
+    #sudo pip -q install --upgrade awscli > /dev/null 
+    sudo apt-get -qy install awscli > /dev/null
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
     echo '+++++ Installing python3 pip +++++'
@@ -149,8 +154,10 @@ Vagrant.configure("2") do |config|
 	chgrp vagrant ${work_dir}
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 	
-	ln -s ${work_dir} ~vagrant/ 
-    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    if [ ! -e ~vagrant/mc_docker_bakery_work ] ; then
+	    ln -s ${work_dir} ~vagrant/ 
+        errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    fi
 
 	echo '******************************************************'
     echo ' After logging in to vagrant box: '
