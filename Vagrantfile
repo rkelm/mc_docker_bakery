@@ -118,8 +118,10 @@ Vagrant.configure("2") do |config|
 	sudo apt-get -qy install emacs-nox > /dev/null 
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
-    echo '+++++ Installing JDK +++++'
+    echo '+++++ Installing JDK(s) +++++'
     sudo apt-get -qy install openjdk-16-jdk > /dev/null 
+    errchk "{$LINENO}: Error provisioning box. Exiting provision script."
+    sudo apt-get -qy install openjdk-17-jdk > /dev/null 
     errchk "{$LINENO}: Error provisioning box. Exiting provision script."
 
     echo '+++++ Installing awscli +++++'
